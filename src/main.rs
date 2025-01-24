@@ -3,32 +3,16 @@
 #![allow(unused_variables)]
 
 use minifb::{Key, Window, WindowOptions};
-use rand::Rng;
+use std::rc::Rc;
 mod visual;
+mod network;
 
 const INITIAL_WIDTH: usize = 1200;
 const INITIAL_HEIGHT: usize = 800;
 
-struct Perceptron {
-    weights: Vec<f32>,
-}
-
-impl Perceptron {
-    fn new(n: usize) -> Self {
-        let mut rng = rand::thread_rng();
-        let weights = (0..n).map(|_| rng.gen_range(-1.0..1.0)).collect();
-        Perceptron { weights }
-    }
-
-    fn predict(&self, inputs: &[f32]) -> f32 {
-        let sum: f32 = self.weights.iter().zip(inputs).map(|(w, i)| w * i).sum();
-        if sum >= 0.0 { 1.0 } else { -1.0 }
-    }
-}
-
 fn main() {
     let mut window = Window::new(
-        "Perceptron Visualization",
+        "Network Visualization",
         INITIAL_WIDTH,
         INITIAL_HEIGHT,
         WindowOptions {
@@ -39,14 +23,18 @@ fn main() {
         panic!("{}", e);
     });
 
-    let perceptron = Perceptron::new(2);
+    let network = Rc::new(network::Network::new(vec![2, 3, 3, 1]));
     let mut buffer: Vec<u32> = vec![0; INITIAL_WIDTH * INITIAL_HEIGHT];
 
     let mut panel_manager = visual::panel_manager::PanelManager::new(10);
-    panel_manager.add_panel(visual::panel::Panel::with_draw_fn(50, 50, 400, 200, Box::new(visual::drawing::draw_perceptron)));
-    panel_manager.add_panel(visual::panel::Panel::with_draw_fn(500, 50, 400, 200, Box::new(visual::drawing::draw_perceptron)));
-    panel_manager.add_panel(visual::panel::Panel::with_draw_fn(50, 300, 1100, 400, Box::new(visual::drawing::draw_perceptron)));
-    panel_manager.add_panel(visual::panel::Panel::with_draw_fn(950, 50, 200, 700, Box::new(visual::drawing::draw_perceptron)));
+    let network_clone = Rc::clone(&network);
+    panel_manager.add_panel(visual::panel::Panel::with_draw_fn(50, 50, 400, 200, Box::new(move |buffer, x, y, w, h, ww, wh| {
+        network_clone.draw(buffer, x, y, w, h, ww, wh);
+    })));
+    let network_clone = Rc::clone(&network);
+    panel_manager.add_panel(visual::panel::Panel::with_draw_fn(500, 50, 400, 200, Box::new(move |buffer, x, y, w, h, ww, wh| {
+        network_clone.draw(buffer, x, y, w, h, ww, wh);
+    })));
 
     while window.is_open() && !window.is_key_down(Key::Escape) {
         let (width, height) = window.get_size();
