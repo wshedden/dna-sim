@@ -4,3 +4,4 @@
 
 pub mod drawing;
 pub mod panel;
+pub mod panel_manager;
