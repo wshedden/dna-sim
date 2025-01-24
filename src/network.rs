@@ -24,15 +24,15 @@ impl Network {
         Network { layers, weights }
     }
 
-    pub fn draw(&self, buffer: &mut Vec<u32>, x_offset: usize, y_offset: usize, width: usize, height: usize, window_width: usize, window_height: usize) {
-        let radius = 20;
-        let layer_spacing = width / (self.layers.len() - 1);
+    pub fn draw(&self, buffer: &mut Vec<u32>, x_offset: usize, y_offset: usize, width: usize, height: usize, window_width: usize, window_height: usize, internal_padding: usize) {
+        let radius = 12;
+        let layer_spacing = (width - 2 * internal_padding - 2 * radius) / (self.layers.len() - 1);
         let mut positions = Vec::new();
 
         for (i, &layer_size) in self.layers.iter().enumerate() {
-            let node_spacing = height / (layer_size + 1);
+            let node_spacing = (height - 2 * internal_padding - 2 * radius) / (layer_size + 1);
             let layer_positions: Vec<(usize, usize)> = (0..layer_size)
-                .map(|j| (x_offset + i * layer_spacing, y_offset + (j + 1) * node_spacing))
+                .map(|j| (x_offset + internal_padding + radius + i * layer_spacing, y_offset + internal_padding + radius + (j + 1) * node_spacing))
                 .collect();
             positions.push(layer_positions);
         }

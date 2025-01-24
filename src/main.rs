@@ -26,14 +26,14 @@ fn main() {
     let network = Rc::new(network::Network::new(vec![2, 3, 3, 1]));
     let mut buffer: Vec<u32> = vec![0; INITIAL_WIDTH * INITIAL_HEIGHT];
 
-    let mut panel_manager = visual::panel_manager::PanelManager::new(10);
+    let mut panel_manager = visual::panel_manager::PanelManager::new(30, 20);
     let network_clone = Rc::clone(&network);
     panel_manager.add_panel(visual::panel::Panel::with_draw_fn(50, 50, 400, 200, Box::new(move |buffer, x, y, w, h, ww, wh| {
-        network_clone.draw(buffer, x, y, w, h, ww, wh);
+        network_clone.draw(buffer, x, y, w, h, ww, wh, 20);
     })));
     let network_clone = Rc::clone(&network);
     panel_manager.add_panel(visual::panel::Panel::with_draw_fn(500, 50, 400, 200, Box::new(move |buffer, x, y, w, h, ww, wh| {
-        network_clone.draw(buffer, x, y, w, h, ww, wh);
+        network_clone.draw(buffer, x, y, w, h, ww, wh, 20);
     })));
 
     while window.is_open() && !window.is_key_down(Key::Escape) {

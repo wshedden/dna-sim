@@ -6,14 +6,16 @@ use crate::visual::panel::Panel;
 
 pub struct PanelManager {
     panels: Vec<Panel>,
-    padding: usize,
+    external_padding: usize,
+    internal_padding: usize,
 }
 
 impl PanelManager {
-    pub fn new(padding: usize) -> Self {
+    pub fn new(external_padding: usize, internal_padding: usize) -> Self {
         PanelManager {
             panels: Vec::new(),
-            padding,
+            external_padding,
+            internal_padding,
         }
     }
 
@@ -22,23 +24,23 @@ impl PanelManager {
     }
 
     pub fn update_positions(&mut self, screen_width: usize, screen_height: usize) {
-        let mut x_offset = self.padding;
-        let mut y_offset = self.padding;
+        let mut x_offset = self.external_padding;
+        let mut y_offset = self.external_padding;
 
         for panel in &mut self.panels {
-            if x_offset + panel.width() + self.padding > screen_width {
-                x_offset = self.padding;
-                y_offset += panel.height() + self.padding;
+            if x_offset + panel.width() + self.external_padding > screen_width {
+                x_offset = self.external_padding;
+                y_offset += panel.height() + self.external_padding;
             }
 
-            if y_offset + panel.height() + self.padding > screen_height {
+            if y_offset + panel.height() + self.external_padding > screen_height {
                 break; // No more space for panels
             }
 
             panel.set_x(x_offset);
             panel.set_y(y_offset);
 
-            x_offset += panel.width() + self.padding;
+            x_offset += panel.width() + self.external_padding;
         }
 
         // Ensure no collisions
@@ -75,13 +77,13 @@ impl PanelManager {
         let panel1 = &mut panel1[i];
         let panel2 = &mut panel2[0];
 
-        if panel1.x() + panel1.width() + self.padding <= screen_width {
-            panel2.set_x(panel1.x() + panel1.width() + self.padding);
-        } else if panel1.y() + panel1.height() + self.padding <= screen_height {
-            panel2.set_y(panel1.y() + panel1.height() + self.padding);
+        if panel1.x() + panel1.width() + self.external_padding <= screen_width {
+            panel2.set_x(panel1.x() + panel1.width() + self.external_padding);
+        } else if panel1.y() + panel1.height() + self.external_padding <= screen_height {
+            panel2.set_y(panel1.y() + panel1.height() + self.external_padding);
         } else {
-            panel2.set_x(self.padding);
-            panel2.set_y(panel1.y() + panel1.height() + self.padding);
+            panel2.set_x(self.external_padding);
+            panel2.set_y(panel1.y() + panel1.height() + self.external_padding);
         }
     }
 
